@@ -45,11 +45,21 @@ Isso cria um novo subdiretório chamado .git que contem todos os arquivos necess
 
 Caso você queira começar a controlar o versionamento dos arquivos existentes (diferente de um diretório vazio), você provavelmente deve começar a monitorar esses arquivos e fazer um commit inicial. Você pode realizar isso com poucos comandos git add que especificam quais arquivos você quer monitorar, seguido de um commit:
 
-    git add *.html
-    git add README
-    git commit -m 'versão Inicial do meu projeto'
+    touch README.md
+    vi README.md
 
-Bem, nós iremos repassar esses comandos mais a frente. Neste ponto, você tem um repositório Git com arquivos monitorados e um commit inicial.
+    git add *.html
+    git add README.md
+    git commit -m 'versão Inicial do meu projeto'
+    
+Suponha que você tenha criado um Repositório no GitHub para seu projeto. Suponha que o repositório se chame `git-introducao` 
+
+Neste caso o comando abaixo irá enviar as alterações objeto do commit para o repositório remoto.
+
+    git remote add origin https://github.com/joao-parana/git-introducao.git
+    git push -u origin master
+
+Bem, nós iremos repassar esses comandos mais a frente. Neste ponto, você tem um repositório Git com um README.md e arquivos HTML monitorados em um commit inicial. Além disso os arquivos "comitados" estão armazenados seguramente em servidor remoto.
 
 ## Opcão 2
 
@@ -86,3 +96,5 @@ Conforme você edita esses arquivos, o Git passa a vê-los como modificados, por
 Você seleciona esses arquivos modificados e então faz o commit de todas as alterações selecionadas. Este ciclo se repete indefinidamente. Este ciclo é apresentado na abaixo.
 
 ![Ciclo de Vida](18333fig0201-tn.png)
+
+
