@@ -539,6 +539,114 @@ Se você quiser remover uma referência por qualquer razão — você moveu o se
      git remote rm paul
      git remote
      
+
+## Submódulos
+
+Freqüentemente enquanto você está trabalhando em um projeto, você precisa usar um outro projeto dentro dele. Talvez seja uma biblioteca desenvolvida por terceiros ou que você está desenvolvendo separadamente e usando em vários projetos pai. Um problema comum surge nestes cenários: você quer tratar os dois projetos em separado mas ainda ser capaz de usar um dentro do outro.
+
+Aqui vai um exemplo. Digamos que você está desenvolvendo um site e criando Atom feeds. Em vez de criar seu próprio gerador de Atom, você decide usar uma biblioteca. Provavelmente você terá que incluir esse código de uma biblioteca compartilhada, como um instalação CPAN ou Ruby gem, ou copiar o código fonte na árvore do seu projeto. O problema com a inclusão da biblioteca é que é difícil de personalizar livremente e muitas vezes difícil de fazer o deploy dela, porque você precisa ter certeza de que cada cliente tem essa biblioteca disponível. O problema com a inclusão do código no seu projeto é que é difícil de fazer o merge de qualquer alteração que você faz quando existem modificações do desenvolvedor da biblioteca.
+
+Git resolve esses problemas usando submódulos. Submódulos permitem que você mantenha um repositório Git como um subdiretório de outro repositório Git. Isso permite que você faça o clone de outro repositório dentro do seu projeto e mantenha seus commits separados.
+
+### Começando com Submódulos
+
+Digamos que você quer adicionar a biblioteca Rack (um servidor de aplicação web em Ruby) ao seu projeto, manter suas próprias alterações nela, mas continuar fazendo o merge do branch principal. A primeira coisa que você deve fazer é fazer o clone do repositório externo dentro do seu subdiretório. Você adiciona projetos externos como submódulos com o comando git submodule add:
+
+	$ git submodule add git://github.com/chneukirchen/rack.git rack
+	Initialized empty Git repository in /opt/subtest/rack/.git/
+	remote: Counting objects: 3181, done.
+	remote: Compressing objects: 100% (1534/1534), done.
+	remote: Total 3181 (delta 1951), reused 2623 (delta 1603)
+	Receiving objects: 100% (3181/3181), 675.42 KiB | 422 KiB/s, done.
+	Resolving deltas: 100% (1951/1951), done.
+
+Agora você tem um projeto do Rack no subdiretório rack dentro do seu projeto. Você pode ir nesse subdiretório, fazer alterações, adicionar seus próprios repositórios remotos para fazer o push de suas modificações, fazer o fetch e o merge do repositório original, e outras coisas. Se você execurar git status logo depois de adicionar o submódulo, você verá duas coisas:
+
+	$ git status
+	# On branch master
+	# Changes to be committed:
+	#   (use "git reset HEAD <file>..." to unstage)
+	#
+	#      new file:   .gitmodules
+	#      new file:   rack
+	#
+
+Primeiro você percebe o arquivo .gitmodules. Esse é um arquivo de configuração que guarda o mapeamento entre a URL do projeto e o subdiretório local que você usou:
+
+	$ cat .gitmodules
+	[submodule "rack"]
+		  path = rack
+		  url = git://github.com/chneukirchen/rack.git
+		  
+Se você tem vários submódulos, você terá várias entradas nesse arquivo. É importante notar que esse arquivo está no controle de versão como os outros, como o seu arquivo .gitignore. É feito o push e pull com o resto do seu projeto. É como as outras pessoas que fazem o clone do projeto sabem onde pegar os projetos dos submódulos.
+
+O outro ítem na saída do git status é sobre o rack. Se você executar git diff nele, você vê uma coisa interessante:
+
+	$ git diff --cached rack
+	diff --git a/rack b/rack
+	new file mode 160000
+	index 0000000..08d709f
+	--- /dev/null
+	+++ b/rack
+	@@ -0,0 +1 @@
+	+Subproject commit 08d709f78b8c5b0fbeb7821e37fa53e69afcf433
+
+Apesar de rack ser um subdiretório no seu diretório de trabalho, Git vê ele como um submódulo e não rastreia seu conteúdo quando você não está no diretório. Em vez disso, Git o grava como um commit especial desse repositório. Quando você altera e faz commit nesse subdiretório, o projeto-pai nota que o HEAD mudou e grava o commit que você está atualmente; dessa forma, quando outros fizerem o clone desse projeto, eles podem recriar o mesmo ambiente.
+
+Esse é um ponto importante sobre submódulos: você os salva como o commit exato onde eles estão. Você não pode salvar um submódulo no master ou em outra referência simbólica.
+
+Quando você faz o commit, você vê algo assim:
+
+	$ git commit -m 'first commit with submodule rack'
+	[master 0550271] first commit with submodule rack
+	 2 files changed, 4 insertions(+), 0 deletions(-)
+	 create mode 100644 .gitmodules
+	 create mode 160000 rack
+
+Note o modo 160000 para a entrada do rack. Esse é um modo especial no Git que basicamente significa que você está salvando um commit como um diretório em vez de um subdiretório ou um arquivo.
+
+Você pode tratar o diretório rack como um projeto separado e atualizar seu projeto-pai de vez em quando com uma referência para o último commit nesse subprojeto. Todos os comandos do Git funcionam independente nos dois diretórios:
+
+	$ git log -1
+	commit 0550271328a0038865aad6331e620cd7238601bb
+	Author: Scott Chacon <schacon@gmail.com>
+	Date:   Thu Apr 9 09:03:56 2009 -0700
+
+		first commit with submodule rack
+	$ cd rack/
+	$ git log -1
+	commit 08d709f78b8c5b0fbeb7821e37fa53e69afcf433
+	Author: Christian Neukirchen <chneukirchen@gmail.com>
+	Date:   Wed Mar 25 14:49:04 2009 +0100
+
+    Document version change
+
+
+### Fazendo Clone de um Projeto com Submódulos
+
+Aqui você vai fazer o clone de um projeto com um submódulo dentro. Quando você recebe um projeto como este, você tem os diretórios que contêm os submódulos, mas nenhum dos arquivos ainda:
+
+	$ git clone git://github.com/schacon/myproject.git
+	Initialized empty Git repository in /opt/myproject/.git/
+	remote: Counting objects: 6, done.
+	remote: Compressing objects: 100% (4/4), done.
+	remote: Total 6 (delta 0), reused 0 (delta 0)
+	Receiving objects: 100% (6/6), done.
+	$ cd myproject
+	$ ls -l
+	total 8
+	-rw-r--r--  1 schacon  admin   3 Apr  9 09:11 README
+	drwxr-xr-x  2 schacon  admin  68 Apr  9 09:11 rack
+	$ ls rack/
+	$
+	
+O diretório rack está lá, mas vazio. Você precisa executar dois comandos: git submodule init para inicializar seu arquivo local de configuração, e git submodule update para buscar todos os dados do projeto e recuperar o commit apropriado conforme descrito em seu projeto-pai:
+
+	$ git submodule init
+	Submodule 'rack' (git://github.com/chneukirchen/rack.git) registered for path 'rack'
+	$ git submodule update
+
+
     
-**Ficou Faltando falar de TAGS**.
+# Ficou Faltando falar de TAGS
    
