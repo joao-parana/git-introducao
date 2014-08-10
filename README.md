@@ -647,6 +647,76 @@ O diretório rack está lá, mas vazio. Você precisa executar dois comandos: gi
 	$ git submodule update
 
 
+## Sequências úteis de comandos no GIT
+
+Segue abaixo algumas sequências úteis de comandos para serem usadas no dia a dia.
+
+### Configuração Global de usuário e e-mail
+
+	git config --global user.name "Seu Nome"
+	git config --global user.email seu-email@seu-provedor.com
+
+### 1. Inicializando um repositório do Zero
+
+	cd diretório-desejado
+	git init
+	echo "# Titulo do meu Repositório" >  README.md
+	git add .
+	git commit -m 'versão Inicial do meu projeto'
+
+### 2. Associando a um repositório remoto e compartilhando os ativos
+
+	git remote add origin https://github.com/seu-usuario/seu-repositorio.git
+	git push -u origin master
+	
+### 3. Definindo o que deve ser ignorado 
+
+	echo "*.class" > .gitignore	
+	echo "*.key" >> .gitignore	
+	echo "*.log" >> .gitignore	
+	echo "*.jar" >> .gitignore	
+	
+### 4. Removendo arquivos do controle de versão
+
+O exemplo abaixo é apenas didático. Supondo que exista o arquivo lixo.txt
+
+	git add lixo.txt 
+	rm lixo.txt
+	git rm lixo.txt 
+	
+### 5. Remover apenas da área de seleção
+
+Manter o arquivo no seu disco rígido mas parar de monitorar com o Git
+
+	git rm --cached meu-arquivo.algo
+	
+### 6. Modificando o ultimo commit (usando opção amend)
+
+	git commit -m 'initial commit'
+	git add arquivo-esquecido
+	git commit --amend
+	
+### 7. Sobreescrevendo tudo da área local com o conteúdo de repositório remoto
+
+	git fetch --all
+	git reset --hard origin/master
+	
+### 8. Atualizando com alterações remotas e fazendo upload das alterações locais
+
+	git pull origin master
+	git add -A . 
+	git commit  -m "Meu comentário sobre as atualizações que estou fazendo no remoto" ; 
+	git push -u origin master
+
+### 9. Exibindo o Status 
+
+	git status
+
+### 10. Exibindo o LOG de alterações 
+
+	git log
+	
+		
     
 # Ficou Faltando falar de TAGS (Rótulos) e Ramificação (Branching)
    
