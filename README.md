@@ -648,5 +648,5 @@ O diretório rack está lá, mas vazio. Você precisa executar dois comandos: gi
 
 
     
-# Ficou Faltando falar de TAGS
+# Ficou Faltando falar de TAGS (Rótulos) e Ramificação (Branching)
    
