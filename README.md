@@ -548,6 +548,8 @@ Aqui vai um exemplo. Digamos que você está desenvolvendo um site e criando Ato
 
 Git resolve esses problemas usando submódulos. Submódulos permitem que você mantenha um repositório Git como um subdiretório de outro repositório Git. Isso permite que você faça o clone de outro repositório dentro do seu projeto e mantenha seus commits separados.
 
+**ATENÇÃO:** Use submdulos com cuidado para não perder alterações quando estiver trabalhando com Branchs e Tags
+
 ### Começando com Submódulos
 
 Digamos que você quer adicionar a biblioteca Rack (um servidor de aplicação web em Ruby) ao seu projeto, manter suas próprias alterações nela, mas continuar fazendo o merge do branch principal. A primeira coisa que você deve fazer é fazer o clone do repositório externo dentro do seu subdiretório. Você adiciona projetos externos como submódulos com o comando git submodule add:
