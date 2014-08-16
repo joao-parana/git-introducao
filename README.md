@@ -721,4 +721,5 @@ Manter o arquivo no seu disco rígido mas parar de monitorar com o Git
 		
     
 # Ficou Faltando falar de TAGS (Rótulos) e Ramificação (Branching)
-   
+
+O livro completo pode ser visto em [https://github.com/progit/progit/tree/master/pt-br](https://github.com/progit/progit/tree/master/pt-br)   
